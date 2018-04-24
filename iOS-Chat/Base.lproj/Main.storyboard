@@ -30,7 +30,7 @@
                                     <constraint firstAttribute="height" constant="30" id="ffq-FE-bNE"/>
                                 </constraints>
                                 <nil key="textColor"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <fontDescription key="fontDescription" name="PingFangSC-Regular" family="PingFang SC" pointSize="18"/>
                                 <textInputTraits key="textInputTraits"/>
                                 <connections>
                                     <action selector="ChangeUserName:" destination="BYZ-38-t0r" eventType="editingDidEnd" id="1O3-zM-0DR"/>
@@ -55,6 +55,10 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                 </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="p9o-cN-jbw"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="Tcn-fG-HQa"/>
+                                </connections>
                             </tableView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="在线列表(点击小人图标查看沙盒内容)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" enabled="NO" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dqe-Oo-dtZ">
                                 <rect key="frame" x="16" y="120" width="343" height="21"/>
