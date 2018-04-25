@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E235E64820904A2D00A21457 /* Chatroom.swift in Sources */ = {isa = PBXBuildFile; fileRef = E235E64720904A2D00A21457 /* Chatroom.swift */; };
 		E2825D3E208EFAD900E0C9D4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2825D3D208EFAD900E0C9D4 /* AppDelegate.swift */; };
 		E2825D40208EFAD900E0C9D4 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2825D3F208EFAD900E0C9D4 /* ViewController.swift */; };
 		E2825D43208EFAD900E0C9D4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E2825D41208EFAD900E0C9D4 /* Main.storyboard */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E235E64720904A2D00A21457 /* Chatroom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chatroom.swift; sourceTree = "<group>"; };
 		E2825D3A208EFAD900E0C9D4 /* iOS-Chat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS-Chat.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2825D3D208EFAD900E0C9D4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E2825D3F208EFAD900E0C9D4 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -66,6 +68,7 @@
 			children = (
 				E2825D3D208EFAD900E0C9D4 /* AppDelegate.swift */,
 				E2825D3F208EFAD900E0C9D4 /* ViewController.swift */,
+				E235E64720904A2D00A21457 /* Chatroom.swift */,
 				E2825D4F208F005C00E0C9D4 /* Network */,
 				E2825D41208EFAD900E0C9D4 /* Main.storyboard */,
 				E2825D44208EFAD900E0C9D4 /* Assets.xcassets */,
@@ -163,6 +166,7 @@
 			files = (
 				E2825D40208EFAD900E0C9D4 /* ViewController.swift in Sources */,
 				E2825D57208F007400E0C9D4 /* Server.m in Sources */,
+				E235E64820904A2D00A21457 /* Chatroom.swift in Sources */,
 				E2825D3E208EFAD900E0C9D4 /* AppDelegate.swift in Sources */,
 				E2825D58208F007400E0C9D4 /* Connection.m in Sources */,
 				E2825D59208F007400E0C9D4 /* ServerBrowser.m in Sources */,
