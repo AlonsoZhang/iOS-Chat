@@ -20,6 +20,7 @@ class ViewController: UIViewController,ServerDelegate,ServerBrowserDelegate,UITe
     var tableviewStyle = "serverlist"
     var file = ""
     var sandboxfilename = ""
+    var Chatrooms = [Chatroom]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,6 +63,14 @@ class ViewController: UIViewController,ServerDelegate,ServerBrowserDelegate,UITe
     }
     
     func handleNewConnectionformNSNetService(_ connection: Connection!, rusername: String!) {
+        let room = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "myChatroom") as! Chatroom
+        room.ownname = serverName.text!
+        room.rusername = rusername
+        room.connection = connection
+        if rusername != nil {
+            self.present(room, animated: true, completion: nil)
+            Chatrooms.append(room)
+        }
 //        Chatroom *room = [[Chatroom alloc]initWithconnection:connection ownname:_servername.text rusername:rusername];
 //        if (rusername !=nil)
 //        {
@@ -131,19 +140,13 @@ class ViewController: UIViewController,ServerDelegate,ServerBrowserDelegate,UITe
                 let selectedService = serverBrowser.servers.object(at: selectedRow) as! NetService
                 if !(selectedService.name == server.severname){
                     var notFind = true
-//                    for (Chatroom *check in Chatrooms){
-//                        if ([check.rusername isEqual:selectedService.name ])
-//                        {
-//                            //NSLog(@"notfind");
-//                            Notfind = NO;
-//                            check.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-//                            [self presentViewController:check animated:YES completion:^{}];
-//                        }
-//                    }
-                    let sb = UIStoryboard(name: "Main", bundle:nil)
-                    var vc = sb.instantiateViewController(withIdentifier: "myChatroom")
-                    self.present(vc, animated: true, completion: nil)
-                    
+                    for check in Chatrooms{
+                        if check.rusername == selectedService.name{
+                            print("no find")
+                            notFind = false
+                            self.present(check, animated: true, completion: nil)
+                        }
+                    }
                     if notFind{
                         print("find")
                         let connection = Connection.init(nsNetService: selectedService)
