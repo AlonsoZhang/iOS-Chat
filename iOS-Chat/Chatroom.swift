@@ -65,60 +65,45 @@ class Chatroom: UIViewController,UITextFieldDelegate,ConnectionDelegate,UITableV
         connection = Connection()
     }
     
-    func receivedNetworkPacket(_ Packet: [String : String]!) {
+    func receivedNetworkPacket(_ Packet: [String : Any]!) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM-dd HH:mm:ss"
         var msg = ""
         if let filestr = Packet["file"] {
-            let file = "\(sandboxfile)/\(Packet["message"])"
+            let file = "\(sandboxfile)/\(Packet["message"]!)"
             connection.filename = nil
-            do {
-                try filestr.write(toFile: file, atomically: true, encoding: .utf8)
-            }catch{
-                print(error)
+            if (filestr as AnyObject).write(toFile: file, atomically: true){
+                print("write pass")
             }
+            msg = "\(Packet["from"]!):(\(dateFormatter.string(from: Date()))\n    成功接收：\(Packet["message"]!)\n"
+        }else if Packet["type"] as! String == "sendfile"{
+            connection.filename = Packet["message"] as! String
             msg = "\(Packet["from"]!):(\(dateFormatter.string(from: Date()))\n    准备接收：\(Packet["message"]!)\n"
-        }else if Packet["type"] == "sendfile"{
-            connection.filename = Packet["message"]
-            msg = "\(Packet["from"]!):(\(dateFormatter.string(from: Date()))\n    准备接收：\(Packet["message"]!)\n"
-            
+            let filepacket: [String : Any] = ["message":Packet["message"]!,"from":ownname,"filepath":Packet["filepath"]!,"type":"needfile"]
+            connection.sendNetworkPacket(filepacket)
+        }else if Packet["type"] as! String == "needfile"{
+            msg = "\(Packet["from"]!):(\(dateFormatter.string(from: Date()))\n    请求发送：\(Packet["message"]!)\n"
+            let fileToSend = NSData.init(contentsOfFile: Packet["filepath"] as! String)!
+            let filepacket: [String : Any] = ["message":Packet["message"]!,"from":Packet["from"]!,"file":fileToSend]
+            connection.sendNetworkPacket(filepacket)
+        }else{
+            msg = "\(Packet["from"]!):(\(dateFormatter.string(from: Date()))\n    \(Packet["message"]!)\n"
         }
 
-//        else if ( [[packet objectForKey:@"type"] isEqualToString:@"sendfile"])
-//        {
-//            _connection.filename=[packet objectForKey:@"message"];
-//            msg = [NSString stringWithFormat:@"%@:(%@)\n    准备接收：%@\n", [packet objectForKey:@"from"], [dateFormatter stringFromDate:[NSDate date]],[packet objectForKey:@"message"]];
-//            NSDictionary* filepacket = [NSDictionary dictionaryWithObjectsAndKeys:[packet objectForKey:@"message"], @"message", _ownname, @"from", [packet objectForKey:@"filepath"], @"filepath",@"needfile", @"type",nil];
-//            [_connection  sendNetworkPacket:filepacket];
-//        }
-//        else if ( [[packet objectForKey:@"type"] isEqualToString:@"needfile"])
-//        {
-//            msg = [NSString stringWithFormat:@"%@:(%@)\n    请求发送：%@\n", [packet objectForKey:@"from"], [dateFormatter stringFromDate:[NSDate date]],[packet objectForKey:@"message"]];
-//            NSData* fileToSend = [NSData dataWithContentsOfFile:[packet objectForKey:@"filepath"]];
-//            NSDictionary* filepacket = [NSDictionary dictionaryWithObjectsAndKeys:[ packet objectForKey:@"message"], @"message", [ packet objectForKey:@"from"], @"from", fileToSend, @"file",nil];
-//            [_connection  sendNetworkPacket:filepacket];
-//        }
-//        else
-//        {
-//            msg = [NSString stringWithFormat:@"%@:(%@)\n    %@\n", [packet objectForKey:@"from"], [dateFormatter stringFromDate:[NSDate date]],[packet objectForKey:@"message"]];
-//        }
-//        if (_rusername == nil)
-//        {
-//            _rusername= [packet objectForKey:@"from"];
-//        }
-//        if (![[packet objectForKey:@"from"]isEqualToString:@"System send"] && ![[packet objectForKey:@"from"]isEqualToString:@"System received"] )
-//        {
-//            //NSLog(@"%@",self.mainname);
-//            if (self.mainname == nil)
-//            {
-//                //self.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-//                [_mainc presentViewController:self animated:NO completion:^{}];
-//            }
-//        }
-//        NSString * currentString = [NSString stringWithFormat:@"%@%@",[_messageview text], msg];
-//        [_messageview setText:currentString];
-//        NSRange range = [currentString rangeOfString:msg options:NSBackwardsSearch];
-//        [_messageview scrollRangeToVisible:range];
+        if rusername.count == 0{
+            rusername = Packet["from"] as! String
+        }
+        
+        if Packet["from"] as! String != "System send" && Packet["from"] as! String != "System received"{
+            if !online{
+                present(self, animated: false, completion: nil)
+            }
+        }
+        
+        let currentString = "\(messageview.text)\(msg)"
+        messageview.text = currentString
+        var range: NSRange = currentString.range(of: msg, options: .backwards)
+        messageview.scrollRangeToVisible(range)
     }
     
     //MARK: - UITextFieldDelegate
