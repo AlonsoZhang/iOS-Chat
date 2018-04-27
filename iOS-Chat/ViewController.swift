@@ -64,21 +64,14 @@ class ViewController: UIViewController,ServerDelegate,ServerBrowserDelegate,UITe
     
     func handleNewConnectionformNSNetService(_ connection: Connection!, rusername: String!) {
         let room = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "myChatroom") as! Chatroom
-        room.ownname = serverName.text!
-        room.rusername = rusername
-        room.connection = connection
         if rusername != nil {
+            room.ownname = serverName.text!
+            room.rusername = rusername
+            room.connection = connection
+            connection.delegate = room
             self.present(room, animated: true, completion: nil)
             Chatrooms.append(room)
         }
-//        Chatroom *room = [[Chatroom alloc]initWithconnection:connection ownname:_servername.text rusername:rusername];
-//        if (rusername !=nil)
-//        {
-//            room.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-//            [self presentViewController:room animated:YES completion:^{}];
-//        }
-//        room.mainc = self;
-//        [Chatrooms addObject:room];
     }
     
     //MARK: - UITextFieldDelegate
@@ -111,7 +104,9 @@ class ViewController: UIViewController,ServerDelegate,ServerBrowserDelegate,UITe
         if serverName.text != server.severname {
             serverBrowser.stop()
             server.stop()
-//            [Chatrooms makeObjectsPerformSelector:@selector(changeownname:) withObject:_servername.text ];
+            Chatrooms.forEach { Chatroom in
+                Chatroom.ownname = serverName.text!
+            }
             server.severname = serverName.text
             server.start()
             RunLoop.current.run(until: Date.init(timeIntervalSinceNow: 1))
@@ -161,14 +156,21 @@ class ViewController: UIViewController,ServerDelegate,ServerBrowserDelegate,UITe
             serverList.deselectRow(at: indexPath, animated: true)
         }else if tableviewStyle == "sandboxlist"{
             sandboxfilename = obtainAllFilesName(file)[indexPath.row]
-            
+            let alertController = UIAlertController(title: "选择操作",
+                                                    message: sandboxfilename,
+                                                    preferredStyle: .alert)
+            let cancelAction = UIAlertAction(title: "打开", style: .cancel, handler: {
+                action in
+                print("打开")
+            })
+            let okAction = UIAlertAction(title: "删除", style: .default, handler: {
+                action in
+                print("删除")
+            })
+            alertController.addAction(cancelAction)
+            alertController.addAction(okAction)
+            self.present(alertController, animated: true, completion: nil)
         }
-//        else if ([tableviewbiaozhi isEqualToString:@"shahelist"])
-//        {
-//            shahefilename = [[self obtainAllFilesName:file] objectAtIndex:[indexPath row]];
-//            UIAlertView * alter = [[UIAlertView alloc] initWithTitle:@"选择操作" message:shahefilename delegate:self cancelButtonTitle:@"打开" otherButtonTitles:@"删除", nil];
-//            [alter show];
-//        }
     }
     
     //MARK: - Function

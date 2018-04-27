@@ -47,12 +47,12 @@ class Chatroom: UIViewController,UITextFieldDelegate,ConnectionDelegate,UITableV
     //MARK: - ConnectionDelegate
     func connectionwillclose() {
         if rusername.count == 0 && online == true {
-//            UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"通知"
-//                message:[NSString stringWithFormat:@"联系人%@已离线，连接中断!",_rusername]
-//                delegate:self
-//                cancelButtonTitle:@"OK"
-//                otherButtonTitles: nil];
-//            [alert show];
+            let alertController = UIAlertController(title: "通知",
+                                                    message: "联系人\(rusername)已离线，连接中断!",
+                                                    preferredStyle: .alert)
+            let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+            alertController.addAction(cancelAction)
+            self.present(alertController, animated: true, completion: nil)
         }
         remoteimage.image = UIImage.init(named: "stop.png")
         sendmessage.text = "\(rusername)已离线,请返回"
@@ -65,7 +65,7 @@ class Chatroom: UIViewController,UITextFieldDelegate,ConnectionDelegate,UITableV
         connection = Connection()
     }
     
-    func receivedNetworkPacket(_ Packet: [String : Any]!) {
+    func receivedNetworkPacket(_ Packet: [AnyHashable : Any]!) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM-dd HH:mm:ss"
         var msg = ""
@@ -76,12 +76,12 @@ class Chatroom: UIViewController,UITextFieldDelegate,ConnectionDelegate,UITableV
                 print("write pass")
             }
             msg = "\(Packet["from"]!):(\(dateFormatter.string(from: Date()))\n    成功接收：\(Packet["message"]!)\n"
-        }else if Packet["type"] as! String == "sendfile"{
+        }else if Packet["type"] as? String == "sendfile"{
             connection.filename = Packet["message"] as! String
             msg = "\(Packet["from"]!):(\(dateFormatter.string(from: Date()))\n    准备接收：\(Packet["message"]!)\n"
             let filepacket: [String : Any] = ["message":Packet["message"]!,"from":ownname,"filepath":Packet["filepath"]!,"type":"needfile"]
             connection.sendNetworkPacket(filepacket)
-        }else if Packet["type"] as! String == "needfile"{
+        }else if Packet["type"] as? String == "needfile"{
             msg = "\(Packet["from"]!):(\(dateFormatter.string(from: Date()))\n    请求发送：\(Packet["message"]!)\n"
             let fileToSend = NSData.init(contentsOfFile: Packet["filepath"] as! String)!
             let filepacket: [String : Any] = ["message":Packet["message"]!,"from":Packet["from"]!,"file":fileToSend]
@@ -102,8 +102,8 @@ class Chatroom: UIViewController,UITextFieldDelegate,ConnectionDelegate,UITableV
         
         let currentString = "\(messageview.text)\(msg)"
         messageview.text = currentString
-        var range: NSRange = currentString.range(of: msg, options: .backwards)
-        messageview.scrollRangeToVisible(range)
+//        var range: NSRange = currentString.range(of: msg, options: .backwards)
+//        messageview.scrollRangeToVisible(range)
     }
     
     //MARK: - UITextFieldDelegate
@@ -138,8 +138,24 @@ class Chatroom: UIViewController,UITextFieldDelegate,ConnectionDelegate,UITableV
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         rowString = list[indexPath.row]
         sendpath = "\(sandboxfile)/\(rowString)"
-//        UIAlertView * alter = [[UIAlertView alloc] initWithTitle:@"是否发送" message:rowString delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"发送", nil];
-//        [alter show];
+        let alertController = UIAlertController(title: "是否发送",
+                                                message: rowString,
+                                                preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
+        let okAction = UIAlertAction(title: "发送", style: .default, handler: {
+            action in
+            let packet: [String : Any] = ["message":self.rowString,"from":self.ownname,"filepath":self.sendpath,"type":"sendfile"]
+            self.connection.sendNetworkPacket(packet)
+            self.remoteimage.isHidden = false
+            self.sendmessage.isHidden = false
+            self.messageview.isHidden = false
+            self.sendlist.isHidden = true
+            self.sendname = self.GO_SANDBOX
+            self.sendfile.isEnabled = true
+        })
+        alertController.addAction(cancelAction)
+        alertController.addAction(okAction)
+        self.present(alertController, animated: true, completion: nil)
     }
     
     //MARK: - ButtonAction
@@ -160,16 +176,10 @@ class Chatroom: UIViewController,UITextFieldDelegate,ConnectionDelegate,UITableV
         let message = sendmessage.text
         sendmessage.text = ""
         if message != nil && (message?.count)! > 0 {
-            <#code#>
+            let filepacket : [String : Any] = ["message":message!,"from":ownname]
+            receivedNetworkPacket(filepacket)
+            connection.sendNetworkPacket(filepacket)
         }
-//        NSString *message = [_sendmessage text];
-//        _sendmessage.text = @"";
-//        if (message && [message length] > 0)
-//        {
-//            NSDictionary* packet = [NSDictionary dictionaryWithObjectsAndKeys:message, @"message", _ownname, @"from", nil];
-//            [self  receivedNetworkPacket:packet];
-//            [_connection  sendNetworkPacket:packet];
-//        }
     }
     
     @IBAction func goback(_ sender: UIBarButtonItem) {
